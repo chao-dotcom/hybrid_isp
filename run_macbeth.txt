@@ -1,0 +1,45 @@
+==================================================================
+HYBRID RAW->RGB MINI-ISP  |  classical vs learned
+==================================================================
+eval image      : macbeth  (256x256)
+noise model     : Poisson-Gaussian  gain=150.0  sigma_read=0.008
+effective sigma : ~0.0583 at mid-gray  (12-bit RAW, RGGB)
+illuminant cast : [np.float64(1.25), np.float64(1.0), np.float64(0.8)]
+
+training learned denoiser (CPU)...
+  [train] epoch  1/40  mse=0.035876
+  [train] epoch  6/40  mse=0.003852
+  [train] epoch 11/40  mse=0.002976
+  [train] epoch 16/40  mse=0.002636
+  [train] epoch 21/40  mse=0.002451
+  [train] epoch 26/40  mse=0.002374
+  [train] epoch 31/40  mse=0.002313
+  [train] epoch 36/40  mse=0.002269
+  [train] epoch 40/40  mse=0.002228
+learned model   : DnCNN-lite, 38,883 params, train=['chelsea', 'coffee'], epochs=40
+
+------------------------------------------------------------------
+MAIN: full-pipeline reconstruction vs ground truth
+method                                    PSNR     SSIM    dPSNR
+------------------------------------------------------------------
+(a) naive bilinear baseline              18.66   0.6006         
+(b) full classical (Malvar+AWB+bilateral)   21.99   0.8190    +3.33
+(c) classical + LEARNED (hybrid)         20.68   0.6137    +2.02
+------------------------------------------------------------------
+dPSNR = gain over the naive baseline (dB).
+------------------------------------------------------------------
+ABLATION 1: demosaic quality (AWB on, denoise off)
+method                                    PSNR     SSIM    dPSNR
+------------------------------------------------------------------
+bilinear demosaic                        19.37   0.6072         
+Malvar-He-Cutler demosaic                20.22   0.5246    +0.85
+------------------------------------------------------------------
+ABLATION 2: denoiser (front-end fixed: Malvar+AWB+gamma)
+method                                    PSNR     SSIM    dPSNR
+------------------------------------------------------------------
+no denoise                               20.22   0.5246         
+classical bilateral                      21.99   0.8190    +1.77
+learned DnCNN-lite                       20.68   0.6137    +0.46
+------------------------------------------------------------------
+total runtime   : 105.0s
+saved PNGs to   : out_macbeth

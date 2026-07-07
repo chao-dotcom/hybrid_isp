@@ -1,0 +1,10 @@
+# Hybrid RAW->RGB mini-ISP
+# Tested on Windows 11 / Python 3.12 with the versions noted below.
+numpy>=1.24        # tested 2.4.4
+scipy>=1.10        # tested 1.17.1  (2D convolution for demosaic)
+scikit-image>=0.21 # tested 0.26.0  (sample images, PSNR/SSIM, bilateral)
+imageio>=2.30      # tested 2.37.3  (PNG I/O for the image dumps)
+pillow>=9.0        # tested 11.3.0  (imageio backend)
+
+# Learned stage (optional). CPU wheel is fine; no GPU required.
+torch>=2.0         # tested 2.11.0+cpu

@@ -1,0 +1,40 @@
+==================================================================
+HYBRID RAW->RGB MINI-ISP  |  classical vs learned
+==================================================================
+eval image      : astronaut  (256x256)
+noise model     : Poisson-Gaussian  gain=150.0  sigma_read=0.008
+effective sigma : ~0.0583 at mid-gray  (12-bit RAW, RGGB)
+illuminant cast : [np.float64(1.15), np.float64(1.0), np.float64(0.9)]
+
+training learned denoiser (CPU)...
+  [train] epoch  1/15  mse=0.035053
+  [train] epoch  6/15  mse=0.003552
+  [train] epoch 11/15  mse=0.002975
+  [train] epoch 15/15  mse=0.002808
+learned model   : DnCNN-lite, 38,883 params, train=['chelsea', 'coffee'], epochs=15
+
+------------------------------------------------------------------
+MAIN: full-pipeline reconstruction vs ground truth
+method                                    PSNR     SSIM    dPSNR
+------------------------------------------------------------------
+(a) naive bilinear baseline              24.06   0.6953         
+(b) full classical (Malvar+AWB+bilateral)   20.73   0.6989    -3.33
+(c) classical + LEARNED (hybrid)         21.10   0.7117    -2.96
+------------------------------------------------------------------
+dPSNR = gain over the naive baseline (dB).
+------------------------------------------------------------------
+ABLATION 1: demosaic quality (AWB on, denoise off)
+method                                    PSNR     SSIM    dPSNR
+------------------------------------------------------------------
+bilinear demosaic                        20.75   0.6950         
+Malvar-He-Cutler demosaic                20.61   0.6605    -0.14
+------------------------------------------------------------------
+ABLATION 2: denoiser (front-end fixed: Malvar+AWB+gamma)
+method                                    PSNR     SSIM    dPSNR
+------------------------------------------------------------------
+no denoise                               20.61   0.6605         
+classical bilateral                      20.73   0.6989    +0.12
+learned DnCNN-lite                       21.10   0.7117    +0.49
+------------------------------------------------------------------
+total runtime   : 28.4s
+saved PNGs to   : out_astronaut
