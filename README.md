@@ -7,11 +7,6 @@
 ![Runtime](https://img.shields.io/badge/runtime-~2%20min-green.svg)
 ![Benchmark](https://img.shields.io/badge/benchmark-Kodak%2024-lightgrey.svg)
 
-![Before and after](docs/comparison.png)
-*Left to right: raw sensor data (naive conversion), classical pipeline, classical + learned denoiser, ground truth.*
-
----
-
 ## Results
 
 All numbers are measured by running this code (CPU only, single seed). PSNR and SSIM both measure closeness to the ground-truth image; higher is better.
