@@ -49,42 +49,6 @@ Full details, every run, and exact commands are in [`RESULTS.md`](RESULTS.md).
 
 ---
 
-## How the pipeline works
-
-Each step fixes one specific problem with the raw sensor data:
-
-```
- Raw sensor data (one color per pixel, noisy)
-        │
-        ▼
- 1. Black level      "Zero" on the sensor isn't really zero. Subtract the baseline.
-        ▼
- 2. Lens shading     Lenses make corners darker. Brighten them back up. (optional)
-        ▼
- 3. Demosaic         Each pixel only saw one color. Estimate the other two.
-        ▼
- 4. White balance    Remove the color cast from the lighting (gray-world method).
-        ▼
- 5. Color matrix     Convert the sensor's colors to standard display colors.
-        ▼
- 6. Gamma            Encode brightness the way screens and eyes expect (sRGB).
-        ▼
- 7. Denoise          Clean up the noise  ◄── classical filter OR learned CNN
-        ▼
- Final color image  →  scored against ground truth (PSNR / SSIM)
-```
-
-<details>
-<summary><b>Why this order? (click to expand)</b></summary>
-
-- **Black level first.** Every color calculation needs a true zero.
-- **Demosaic before color.** White balance and color correction need all three colors at every pixel.
-- **White balance and color matrix before gamma.** These assume brightness is *linear* (proportional to light). Applying them after gamma would shift hues and exposure.
-- **Gamma near the end.** Everything upstream is linear; we convert for the display last.
-- **Denoise at the end (in this project).** The classical filter and the neural network then see identical inputs, so the comparison is fair. Real ISPs often denoise earlier, directly on raw data, and this design supports that too.
-
-</details>
-
 ### The learned part
 
 The neural network (`learned/model.py`) is a small **DnCNN-style** denoiser with 6 convolution layers. Instead of predicting the clean image directly, it predicts *the noise* and subtracts it. This "residual" approach trains quickly on very little data, which is what makes a CPU-only demo possible.
